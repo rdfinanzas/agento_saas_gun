@@ -1,0 +1,460 @@
+{
+  "timestamp": "2026-03-18T13:17:44.981Z",
+  "summary": {
+    "total": 14,
+    "passed": 0,
+    "failed": 14,
+    "warnings": 0,
+    "averageResponseTime": 3
+  },
+  "results": [
+    {
+      "requestId": "agents-chat-001",
+      "flowName": "agents-chat",
+      "path": "/api/v1/chat",
+      "method": "POST",
+      "nodeStatus": 201,
+      "bunStatus": 0,
+      "nodeBody": {
+        "sessionId": "session-001",
+        "agentId": "agent-001",
+        "status": "ACTIVE",
+        "createdAt": "2024-01-15T10:20:00.000Z"
+      },
+      "bunBody": null,
+      "match": false,
+      "differences": [
+        "Request failed: Error: Unable to connect. Is the computer able to access the url?"
+      ],
+      "responseTime": 29
+    },
+    {
+      "requestId": "agents-chat-002",
+      "flowName": "agents-chat",
+      "path": "/api/v1/chat/session-001/message",
+      "method": "POST",
+      "nodeStatus": 200,
+      "bunStatus": 0,
+      "nodeBody": {
+        "messageId": "msg-001",
+        "content": "¡Hola! Estoy muy bien, gracias por preguntar. ¿En qué puedo ayudarte hoy?",
+        "role": "assistant",
+        "createdAt": "2024-01-15T10:20:02.000Z"
+      },
+      "bunBody": null,
+      "match": false,
+      "differences": [
+        "Request failed: Error: Unable to connect. Is the computer able to access the url?"
+      ],
+      "responseTime": 1
+    },
+    {
+      "requestId": "agents-create-001",
+      "flowName": "agents-create",
+      "path": "/api/v1/agents",
+      "method": "POST",
+      "nodeStatus": 201,
+      "bunStatus": 0,
+      "nodeBody": {
+        "id": "agent-003",
+        "name": "Test Agent",
+        "description": "Agent for testing purposes",
+        "status": "DRAFT",
+        "model": "gpt-4",
+        "temperature": 0.7,
+        "createdAt": "2024-01-15T10:15:00.000Z"
+      },
+      "bunBody": null,
+      "match": false,
+      "differences": [
+        "Request failed: Error: Unable to connect. Is the computer able to access the url?"
+      ],
+      "responseTime": 1
+    },
+    {
+      "requestId": "agents-list-001",
+      "flowName": "agents-list",
+      "path": "/api/v1/agents",
+      "method": "GET",
+      "nodeStatus": 200,
+      "bunStatus": 0,
+      "nodeBody": [
+        {
+          "id": "agent-001",
+          "name": "Sales Assistant",
+          "description": "Helps with sales inquiries",
+          "status": "ACTIVE",
+          "model": "gpt-4",
+          "createdAt": "2024-01-01T00:00:00.000Z"
+        },
+        {
+          "id": "agent-002",
+          "name": "Support Bot",
+          "description": "Customer support agent",
+          "status": "ACTIVE",
+          "model": "gpt-4",
+          "createdAt": "2024-01-02T00:00:00.000Z"
+        }
+      ],
+      "bunBody": null,
+      "match": false,
+      "differences": [
+        "Request failed: Error: Unable to connect. Is the computer able to access the url?"
+      ],
+      "responseTime": 1
+    },
+    {
+      "requestId": "billing-change-001",
+      "flowName": "billing-change-plan",
+      "path": "/api/v1/billing/change-plan",
+      "method": "POST",
+      "nodeStatus": 200,
+      "bunStatus": 0,
+      "nodeBody": {
+        "success": true,
+        "subscription": {
+          "id": "sub-001",
+          "plan": "ENTERPRISE",
+          "status": "ACTIVE",
+          "updatedAt": "2024-01-15T10:40:00.000Z"
+        }
+      },
+      "bunBody": null,
+      "match": false,
+      "differences": [
+        "Request failed: Error: Unable to connect. Is the computer able to access the url?"
+      ],
+      "responseTime": 0
+    },
+    {
+      "requestId": "billing-view-001",
+      "flowName": "billing-view",
+      "path": "/api/v1/billing",
+      "method": "GET",
+      "nodeStatus": 200,
+      "bunStatus": 0,
+      "nodeBody": {
+        "subscription": {
+          "id": "sub-001",
+          "plan": "PRO",
+          "status": "ACTIVE",
+          "currentPeriodStart": "2024-01-01T00:00:00.000Z",
+          "currentPeriodEnd": "2024-02-01T00:00:00.000Z"
+        },
+        "usage": {
+          "messagesUsed": 1500,
+          "messagesLimit": 5000,
+          "storageUsed": 2.5,
+          "storageLimit": 10
+        }
+      },
+      "bunBody": null,
+      "match": false,
+      "differences": [
+        "Request failed: Error: Unable to connect. Is the computer able to access the url?"
+      ],
+      "responseTime": 0
+    },
+    {
+      "requestId": "integrations-list-001",
+      "flowName": "integrations-list",
+      "path": "/api/v1/integrations",
+      "method": "GET",
+      "nodeStatus": 200,
+      "bunStatus": 0,
+      "nodeBody": [
+        {
+          "id": "int-001",
+          "name": "Google Sheets",
+          "type": "GOOGLE",
+          "status": "ACTIVE",
+          "lastSync": "2024-01-15T09:00:00.000Z"
+        },
+        {
+          "id": "int-002",
+          "name": "HubSpot CRM",
+          "type": "CRM",
+          "status": "ACTIVE",
+          "lastSync": "2024-01-15T08:30:00.000Z"
+        }
+      ],
+      "bunBody": null,
+      "match": false,
+      "differences": [
+        "Request failed: Error: Unable to connect. Is the computer able to access the url?"
+      ],
+      "responseTime": 0
+    },
+    {
+      "requestId": "knowledge-create-001",
+      "flowName": "knowledge-create",
+      "path": "/api/v1/knowledge",
+      "method": "POST",
+      "nodeStatus": 201,
+      "bunStatus": 0,
+      "nodeBody": {
+        "id": "kb-003",
+        "title": "Test Knowledge",
+        "content": "This is a test knowledge entry",
+        "type": "OTHER",
+        "status": "ACTIVE",
+        "createdAt": "2024-01-15T10:55:00.000Z"
+      },
+      "bunBody": null,
+      "match": false,
+      "differences": [
+        "Request failed: Error: Unable to connect. Is the computer able to access the url?"
+      ],
+      "responseTime": 1
+    },
+    {
+      "requestId": "knowledge-list-001",
+      "flowName": "knowledge-list",
+      "path": "/api/v1/knowledge",
+      "method": "GET",
+      "nodeStatus": 200,
+      "bunStatus": 0,
+      "nodeBody": [
+        {
+          "id": "kb-001",
+          "title": "Product FAQ",
+          "type": "FAQ",
+          "status": "ACTIVE",
+          "entries": 25,
+          "updatedAt": "2024-01-14T00:00:00.000Z"
+        },
+        {
+          "id": "kb-002",
+          "title": "Company Policies",
+          "type": "POLICY",
+          "status": "ACTIVE",
+          "entries": 10,
+          "updatedAt": "2024-01-10T00:00:00.000Z"
+        }
+      ],
+      "bunBody": null,
+      "match": false,
+      "differences": [
+        "Request failed: Error: Unable to connect. Is the computer able to access the url?"
+      ],
+      "responseTime": 1
+    },
+    {
+      "requestId": "login-001",
+      "flowName": "login",
+      "path": "/api/v1/auth/login",
+      "method": "POST",
+      "nodeStatus": 200,
+      "bunStatus": 0,
+      "nodeBody": {
+        "success": true,
+        "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.test",
+        "refreshToken": "refresh-token-test",
+        "user": {
+          "id": "user-001",
+          "email": "test@example.com",
+          "name": "Test User",
+          "role": "MEMBER",
+          "tenantId": "tenant-001"
+        }
+      },
+      "bunBody": null,
+      "match": false,
+      "differences": [
+        "Request failed: Error: Unable to connect. Is the computer able to access the url?"
+      ],
+      "responseTime": 1
+    },
+    {
+      "requestId": "login-002",
+      "flowName": "login",
+      "path": "/api/v1/auth/me",
+      "method": "GET",
+      "nodeStatus": 200,
+      "bunStatus": 0,
+      "nodeBody": {
+        "id": "user-001",
+        "email": "test@example.com",
+        "name": "Test User",
+        "role": "MEMBER",
+        "tenantId": "tenant-001",
+        "createdAt": "2024-01-01T00:00:00.000Z"
+      },
+      "bunBody": null,
+      "match": false,
+      "differences": [
+        "Request failed: Error: Unable to connect. Is the computer able to access the url?"
+      ],
+      "responseTime": 1
+    },
+    {
+      "requestId": "register-001",
+      "flowName": "register",
+      "path": "/api/v1/auth/register",
+      "method": "POST",
+      "nodeStatus": 201,
+      "bunStatus": 0,
+      "nodeBody": {
+        "success": true,
+        "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.newuser",
+        "refreshToken": "refresh-token-newuser",
+        "user": {
+          "id": "user-002",
+          "email": "newuser@example.com",
+          "name": "New User",
+          "role": "OWNER",
+          "tenantId": "tenant-002"
+        }
+      },
+      "bunBody": null,
+      "match": false,
+      "differences": [
+        "Request failed: Error: Unable to connect. Is the computer able to access the url?"
+      ],
+      "responseTime": 0
+    },
+    {
+      "requestId": "whatsapp-create-001",
+      "flowName": "whatsapp-create",
+      "path": "/api/v1/whatsapp/configs",
+      "method": "POST",
+      "nodeStatus": 201,
+      "bunStatus": 0,
+      "nodeBody": {
+        "id": "wa-002",
+        "phoneNumberId": "987654321098765",
+        "status": "PENDING",
+        "createdAt": "2024-01-15T10:30:00.000Z"
+      },
+      "bunBody": null,
+      "match": false,
+      "differences": [
+        "Request failed: Error: Unable to connect. Is the computer able to access the url?"
+      ],
+      "responseTime": 0
+    },
+    {
+      "requestId": "whatsapp-list-001",
+      "flowName": "whatsapp-list",
+      "path": "/api/v1/whatsapp/configs",
+      "method": "GET",
+      "nodeStatus": 200,
+      "bunStatus": 0,
+      "nodeBody": [
+        {
+          "id": "wa-001",
+          "phoneNumberId": "123456789012345",
+          "status": "CONNECTED",
+          "agentId": "agent-001",
+          "createdAt": "2024-01-01T00:00:00.000Z"
+        }
+      ],
+      "bunBody": null,
+      "match": false,
+      "differences": [
+        "Request failed: Error: Unable to connect. Is the computer able to access the url?"
+      ],
+      "responseTime": 0
+    }
+  ],
+  "failedEndpoints": [
+    {
+      "path": "/api/v1/chat",
+      "method": "POST",
+      "differences": [
+        "Request failed: Error: Unable to connect. Is the computer able to access the url?"
+      ]
+    },
+    {
+      "path": "/api/v1/chat/session-001/message",
+      "method": "POST",
+      "differences": [
+        "Request failed: Error: Unable to connect. Is the computer able to access the url?"
+      ]
+    },
+    {
+      "path": "/api/v1/agents",
+      "method": "POST",
+      "differences": [
+        "Request failed: Error: Unable to connect. Is the computer able to access the url?"
+      ]
+    },
+    {
+      "path": "/api/v1/agents",
+      "method": "GET",
+      "differences": [
+        "Request failed: Error: Unable to connect. Is the computer able to access the url?"
+      ]
+    },
+    {
+      "path": "/api/v1/billing/change-plan",
+      "method": "POST",
+      "differences": [
+        "Request failed: Error: Unable to connect. Is the computer able to access the url?"
+      ]
+    },
+    {
+      "path": "/api/v1/billing",
+      "method": "GET",
+      "differences": [
+        "Request failed: Error: Unable to connect. Is the computer able to access the url?"
+      ]
+    },
+    {
+      "path": "/api/v1/integrations",
+      "method": "GET",
+      "differences": [
+        "Request failed: Error: Unable to connect. Is the computer able to access the url?"
+      ]
+    },
+    {
+      "path": "/api/v1/knowledge",
+      "method": "POST",
+      "differences": [
+        "Request failed: Error: Unable to connect. Is the computer able to access the url?"
+      ]
+    },
+    {
+      "path": "/api/v1/knowledge",
+      "method": "GET",
+      "differences": [
+        "Request failed: Error: Unable to connect. Is the computer able to access the url?"
+      ]
+    },
+    {
+      "path": "/api/v1/auth/login",
+      "method": "POST",
+      "differences": [
+        "Request failed: Error: Unable to connect. Is the computer able to access the url?"
+      ]
+    },
+    {
+      "path": "/api/v1/auth/me",
+      "method": "GET",
+      "differences": [
+        "Request failed: Error: Unable to connect. Is the computer able to access the url?"
+      ]
+    },
+    {
+      "path": "/api/v1/auth/register",
+      "method": "POST",
+      "differences": [
+        "Request failed: Error: Unable to connect. Is the computer able to access the url?"
+      ]
+    },
+    {
+      "path": "/api/v1/whatsapp/configs",
+      "method": "POST",
+      "differences": [
+        "Request failed: Error: Unable to connect. Is the computer able to access the url?"
+      ]
+    },
+    {
+      "path": "/api/v1/whatsapp/configs",
+      "method": "GET",
+      "differences": [
+        "Request failed: Error: Unable to connect. Is the computer able to access the url?"
+      ]
+    }
+  ]
+}

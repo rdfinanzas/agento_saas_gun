@@ -1,0 +1,30 @@
+{
+  "validUser": {
+    "email": "test@agento.test",
+    "password": "TestPassword123!",
+    "firstName": "Test",
+    "lastName": "User",
+    "role": "USER"
+  },
+  "adminUser": {
+    "email": "admin@agento.test",
+    "password": "AdminPassword123!",
+    "firstName": "Admin",
+    "lastName": "User",
+    "role": "ADMIN"
+  },
+  "newUser": {
+    "email": "newuser@agento.test",
+    "password": "NewUserPass123!",
+    "firstName": "New",
+    "lastName": "User"
+  },
+  "invalidUser": {
+    "email": "invalid-email",
+    "password": "123"
+  },
+  "nonExistentUser": {
+    "email": "nonexistent@agento.test",
+    "password": "SomePassword123!"
+  }
+}

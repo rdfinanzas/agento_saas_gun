@@ -1,0 +1,41 @@
+# Bun configuration for @agento/agent-core
+
+# Install configuration
+[install]
+# Use exact versions for dependencies
+exact = true
+
+# Production optimizations
+[install.production]
+# Exclude dev dependencies in production install
+dev = false
+
+# Build configuration
+[build]
+# Entry point
+entry = "src/index.ts"
+# Output directory
+outdir = "dist"
+# Target environment
+target = "bun"
+# Generate source maps
+sourcemap = "external"
+# Minify in production
+minify = false
+
+# Development server (if needed)
+[serve]
+# Port for development server
+port = 3001
+
+# Test configuration
+[test]
+# Test file pattern
+pattern = "**/*.{test,spec}.{ts,tsx}"
+# Coverage collection
+coverage = true
+
+# Runtime configuration
+[run]
+# Silent mode for scripts
+silent = false

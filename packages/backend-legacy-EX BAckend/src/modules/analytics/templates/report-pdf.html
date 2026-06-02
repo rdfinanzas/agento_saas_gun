@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="{{language}}">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AgentO Analytics Report</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-size: 12px;
+      line-height: 1.6;
+      color: #333;
+      background: #f5f5f5;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    .header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 30px;
+      border-radius: 10px;
+      margin-bottom: 30px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .header::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      right: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+      animation: pulse 3s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); opacity: 0.5; }
+      50% { transform: scale(1.05); opacity: 0.8; }
+    }
+
+    .header h1 {
+      font-size: 28px;
+      margin-bottom: 10px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .header p {
+      opacity: 0.9;
+      position: relative;
+      z-index: 1;
+    }
+
+    .header-meta {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 20px;
+      font-size: 11px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .section {
+      background: white;
+      border-radius: 10px;
+      padding: 25px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    }
+
+    .section-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: #667eea;
+      margin-bottom: 20px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid #f0f0f0;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .section-title::before {
+      content: '';
+      width: 4px;
+      height: 20px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border-radius: 2px;
+    }
+
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 15px;
+    }
+
+    .kpi-card {
+      background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+      padding: 20px;
+      border-radius: 12px;
+      border-left: 4px solid #667eea;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .kpi-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 15px rgba(102, 126, 234, 0.2);
+    }
+
+    .kpi-label {
+      font-size: 11px;
+      color: #666;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      font-weight: 600;
+    }
+
+    .kpi-value {
+      font-size: 28px;
+      font-weight: 700;
+      color: #333;
+      margin: 10px 0;
+      line-height: 1;
+    }
+
+    .kpi-trend {
+      font-size: 11px;
+      font-weight: 500;
+    }
+
+    .kpi-trend.positive {
+      color: #10b981;
+    }
+
+    .kpi-trend.negative {
+      color: #ef4444;
+    }
+
+    .kpi-trend.neutral {
+      color: #6b7280;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
+    }
+
+    th,
+    td {
+      padding: 12px;
+      text-align: left;
+      border-bottom: 1px solid #eee;
+    }
+
+    th {
+      background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+      font-weight: 600;
+      color: #555;
+      text-transform: uppercase;
+      font-size: 10px;
+      letter-spacing: 0.5px;
+    }
+
+    tr:hover {
+      background: #f8f9fa;
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    .chart-placeholder {
+      background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+      height: 200px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #667eea;
+      font-weight: 600;
+      font-size: 14px;
+      border: 2px dashed rgba(102, 126, 234, 0.3);
+    }
+
+    .footer {
+      text-align: center;
+      padding: 20px;
+      color: #999;
+      font-size: 11px;
+      margin-top: 30px;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .badge-success {
+      background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+      color: #065f46;
+    }
+
+    .badge-warning {
+      background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+      color: #92400e;
+    }
+
+    .badge-danger {
+      background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+      color: #991b1b;
+    }
+
+    .badge-info {
+      background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+      color: #1e40af;
+    }
+
+    .progress-bar {
+      height: 8px;
+      background: #e5e7eb;
+      border-radius: 10px;
+      overflow: hidden;
+      margin-top: 5px;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+      transition: width 0.3s ease;
+    }
+
+    .metric-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 0;
+      border-bottom: 1px solid #f0f0f0;
+    }
+
+    .metric-row:last-child {
+      border-bottom: none;
+    }
+
+    .metric-label {
+      font-size: 12px;
+      color: #666;
+    }
+
+    .metric-value {
+      font-size: 16px;
+      font-weight: 600;
+      color: #333;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-top: 15px;
+    }
+
+    .stat-item {
+      text-align: center;
+      padding: 15px;
+      background: #f8f9fa;
+      border-radius: 8px;
+    }
+
+    .stat-value {
+      font-size: 20px;
+      font-weight: 700;
+      color: #667eea;
+    }
+
+    .stat-label {
+      font-size: 10px;
+      color: #666;
+      text-transform: uppercase;
+      margin-top: 5px;
+    }
+
+    .comparison-section {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+      margin-top: 20px;
+    }
+
+    .comparison-card {
+      background: #f8f9fa;
+      padding: 15px;
+      border-radius: 8px;
+    }
+
+    .comparison-title {
+      font-size: 12px;
+      font-weight: 600;
+      color: #666;
+      margin-bottom: 10px;
+    }
+
+    .comparison-value {
+      font-size: 24px;
+      font-weight: 700;
+    }
+
+    .logo-placeholder {
+      width: 60px;
+      height: 60px;
+      background: white;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      margin-bottom: 15px;
+    }
+
+    @media print {
+      body {
+        background: white;
+      }
+      .kpi-card:hover {
+        transform: none;
+        box-shadow: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <div class="header">
+      <div class="logo-placeholder">🤖</div>
+      <h1>{{tenantName}}</h1>
+      <p>Analytics Report</p>
+      <div class="header-meta">
+        <span>Period: {{reportPeriod}}</span>
+        <span>Generated: {{generatedAt}}</span>
+      </div>
+    </div>
+
+    <!-- KPIs Section -->
+    <div class="section">
+      <div class="section-title">Key Performance Indicators</div>
+      <div class="kpi-grid">
+        <div class="kpi-card">
+          <div class="kpi-label">Total Conversations</div>
+          <div class="kpi-value">{{totalConversations}}</div>
+          <div class="kpi-trend positive">
+            ↑ {{conversationRate}}% vs last period
+          </div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Avg Response Time</div>
+          <div class="kpi-value">{{avgResponseTime}}</div>
+          <div class="kpi-trend {{responseTimeTrend}}">
+            {{responseTimeTrendIcon}} {{responseTimeChange}}% vs last period
+          </div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Satisfaction Rate</div>
+          <div class="kpi-value">{{satisfactionRate}}%</div>
+          <div class="progress-bar">
+            <div class="progress-fill" style="width: {{satisfactionRate}}%"></div>
+          </div>
+          <div class="kpi-trend positive" style="margin-top: 5px;">
+            ↑ {{satisfactionChange}}% vs last period
+          </div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Human Takeover Rate</div>
+          <div class="kpi-value">{{humanTakeoverRate}}%</div>
+          <div class="progress-bar">
+            <div class="progress-fill" style="width: {{humanTakeoverRate}}%; background: linear-gradient(90deg, #ef4444 0%, #f59e0b 100%);"></div>
+          </div>
+          <div class="kpi-trend {{takeoverTrend}}" style="margin-top: 5px;">
+            {{takeoverTrendIcon}} {{takeoverChange}}% vs last period
+          </div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Conversion Rate</div>
+          <div class="kpi-value">{{conversionRate}}%</div>
+          <div class="progress-bar">
+            <div class="progress-fill" style="width: {{conversionRate}}%; background: linear-gradient(90deg, #10b981 0%, #059669 100%);"></div>
+          </div>
+          <div class="kpi-trend positive" style="margin-top: 5px;">
+            ↑ {{conversionChange}}% vs last period
+          </div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">First Contact Resolution</div>
+          <div class="kpi-value">{{firstContactResolution}}%</div>
+          <div class="progress-bar">
+            <div class="progress-fill" style="width: {{firstContactResolution}}%; background: linear-gradient(90deg, #3b82f6 0%, #1d4ed8 100%);"></div>
+          </div>
+          <div class="kpi-trend positive" style="margin-top: 5px;">
+            ↑ {{fcrChange}}% vs last period
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Conversation Stats -->
+    <div class="section">
+      <div class="section-title">Conversation Statistics</div>
+      <div class="stats-grid">
+        <div class="stat-item">
+          <div class="stat-value">{{activeConversations}}</div>
+          <div class="stat-label">Active</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value">{{closedConversations}}</div>
+          <div class="stat-label">Closed</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value">{{humanTakeoverConversations}}</div>
+          <div class="stat-label">Human Takeover</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Charts Section -->
+    {{#if includeCharts}}
+    <div class="section">
+      <div class="section-title">Trends Overview</div>
+      <div class="chart-placeholder">
+        📊 Conversation Volume Over Time
+      </div>
+      <div class="chart-placeholder" style="margin-top: 15px;">
+        📈 Response Time Trend
+      </div>
+      <div class="chart-placeholder" style="margin-top: 15px;">
+        🎯 Satisfaction Rate Evolution
+      </div>
+    </div>
+    {{/if}}
+
+    <!-- Performance Metrics -->
+    <div class="section">
+      <div class="section-title">Performance Metrics</div>
+      <div class="metric-row">
+        <div>
+          <div class="metric-label">Average Messages per Conversation</div>
+          <div class="metric-value">{{avgMessagesPerConversation}}</div>
+        </div>
+        <span class="badge badge-info">Messages</span>
+      </div>
+      <div class="metric-row">
+        <div>
+          <div class="metric-label">Peak Usage Hour</div>
+          <div class="metric-value">{{peakUsageHour}}:00</div>
+        </div>
+        <span class="badge badge-warning">Peak</span>
+      </div>
+      <div class="metric-row">
+        <div>
+          <div class="metric-label">Total Messages Processed</div>
+          <div class="metric-value">{{totalMessages}}</div>
+        </div>
+        <span class="badge badge-success">Volume</span>
+      </div>
+    </div>
+
+    <!-- Agents Performance -->
+    <div class="section">
+      <div class="section-title">Agent Performance</div>
+      <table>
+        <thead>
+          <tr>
+            <th>Agent</th>
+            <th>Conversations</th>
+            <th>Messages</th>
+            <th>Avg Response</th>
+            <th>Success Rate</th>
+          </tr>
+        </thead>
+        <tbody>
+          {{#each agents}}
+          <tr>
+            <td>{{this.name}}</td>
+            <td>{{this.conversations}}</td>
+            <td>{{this.messages}}</td>
+            <td>{{this.avgResponse}}</td>
+            <td><span class="badge badge-success">{{this.successRate}}%</span></td>
+          </tr>
+          {{/each}}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Issues Detected -->
+    <div class="section">
+      <div class="section-title">Issues & Resolutions</div>
+      <div class="comparison-section">
+        <div class="comparison-card">
+          <div class="comparison-title">Issues Detected</div>
+          <div class="comparison-value" style="color: #ef4444;">{{issuesDetected}}</div>
+        </div>
+        <div class="comparison-card">
+          <div class="comparison-title">Issues Resolved</div>
+          <div class="comparison-value" style="color: #10b981;">{{issuesResolved}}</div>
+        </div>
+      </div>
+      <div class="metric-row" style="margin-top: 15px; border-top: 1px solid #f0f0f0; padding-top: 15px;">
+        <div>
+          <div class="metric-label">Resolution Rate</div>
+          <div class="metric-value">{{resolutionRate}}%</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+      <p><strong>Generated by AgentO Analytics Platform</strong></p>
+      <p>{{generatedAt}} | Report ID: {{reportId}}</p>
+      <p style="margin-top: 10px; font-size: 10px;">
+        This report contains confidential business information.
+      </p>
+    </div>
+  </div>
+</body>
+</html>

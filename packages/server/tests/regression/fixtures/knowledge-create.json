@@ -1,0 +1,22 @@
+[
+  {
+    "id": "knowledge-create-001",
+    "timestamp": "2024-01-15T10:55:00.000Z",
+    "method": "POST",
+    "url": "http://localhost:3000/api/v1/knowledge",
+    "path": "/api/v1/knowledge",
+    "query": {},
+    "headers": {
+      "content-type": "application/json"
+    },
+    "body": "{\"title\":\"Test Knowledge\",\"content\":\"This is a test knowledge entry\",\"type\":\"OTHER\"}",
+    "response": {
+      "status": 201,
+      "statusText": "Created",
+      "headers": {
+        "content-type": "application/json"
+      },
+      "body": "{\"id\":\"kb-003\",\"title\":\"Test Knowledge\",\"content\":\"This is a test knowledge entry\",\"type\":\"OTHER\",\"status\":\"ACTIVE\",\"createdAt\":\"2024-01-15T10:55:00.000Z\"}"
+    }
+  }
+]

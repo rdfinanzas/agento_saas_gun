@@ -1,0 +1,21 @@
+[
+  {
+    "id": "whatsapp-list-001",
+    "timestamp": "2024-01-15T10:25:00.000Z",
+    "method": "GET",
+    "url": "http://localhost:3000/api/v1/whatsapp/configs",
+    "path": "/api/v1/whatsapp/configs",
+    "query": {},
+    "headers": {
+      "content-type": "application/json"
+    },
+    "response": {
+      "status": 200,
+      "statusText": "OK",
+      "headers": {
+        "content-type": "application/json"
+      },
+      "body": "[{\"id\":\"wa-001\",\"phoneNumberId\":\"123456789012345\",\"status\":\"CONNECTED\",\"agentId\":\"agent-001\",\"createdAt\":\"2024-01-01T00:00:00.000Z\"}]"
+    }
+  }
+]

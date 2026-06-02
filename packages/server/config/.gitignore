@@ -1,0 +1,8 @@
+# Ignorar archivos de configuración con API keys
+ai-providers.json
+*.secure.json
+credentials.json
+secrets.json
+
+# Mantener archivos de ejemplo
+*.example.json

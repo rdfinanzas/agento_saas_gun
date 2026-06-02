@@ -1,0 +1,9 @@
+export { providersRoutes } from './providers.routes';
+export { agentIdentityRoutes } from './agent-identity.routes';
+export { permissionsRoutes } from './permissions.routes';
+export { skillsRoutes } from './skills.routes';
+export { skillsMarketplaceRoutes } from './skills-marketplace.routes';
+export { sandboxRoutes } from './sandbox.routes';
+export { automationRoutes } from './automation.routes';
+export { apiConnectorsRoutes } from './api-connectors.routes';
+export { approvalRoutes } from './approval.routes';

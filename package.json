@@ -1,0 +1,35 @@
+{
+  "name": "agento-saas",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "packages/backend-legacy",
+    "packages/frontend",
+    "packages/agent-core",
+    "packages/ai-worker",
+    "packages/server",
+    "packages/storage",
+    "packages/opencode-fork"
+  ],
+  "scripts": {
+    "dev": "turbo run dev",
+    "dev:all": "start-all.bat",
+    "dev:linux": "./start-all-linux.sh",
+    "dev:opencode": "bun run start-opencode-server.ts",
+    "dev:clean": "node scripts/dev-clean.js",
+    "stop:linux": "./stop-all-linux.sh",
+    "build": "turbo run build",
+    "test": "turbo run test",
+    "test:unit": "cd packages/server && bun test",
+    "test:integration": "cd packages/server && bun test src/tests/integration",
+    "test:e2e": "cd tests && npm run test",
+    "test:e2e:ui": "cd tests && npm run test:ui",
+    "test:coverage": "cd packages/server && bun test --coverage",
+    "test:all": "npm run test:unit && npm run test:integration && npm run test:e2e",
+    "lint": "turbo run lint",
+    "typecheck": "turbo run typecheck"
+  },
+  "devDependencies": {
+    "turbo": "^1.12.4"
+  }
+}

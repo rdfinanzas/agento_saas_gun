@@ -1,0 +1,19 @@
+{
+  "name": "agento-tests",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "test": "playwright test",
+    "test:headed": "playwright test --headed",
+    "test:debug": "playwright test --debug",
+    "test:ui": "playwright test --ui",
+    "report": "playwright show-report",
+    "test:unit": "cd ../packages/server && bun test",
+    "test:coverage": "npm run test -- --coverage"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.40.0",
+    "@types/node": "^20.11.0",
+    "typescript": "^5.3.0"
+  }
+}

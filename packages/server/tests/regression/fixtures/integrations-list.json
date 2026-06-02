@@ -1,0 +1,21 @@
+[
+  {
+    "id": "integrations-list-001",
+    "timestamp": "2024-01-15T10:45:00.000Z",
+    "method": "GET",
+    "url": "http://localhost:3000/api/v1/integrations",
+    "path": "/api/v1/integrations",
+    "query": {},
+    "headers": {
+      "content-type": "application/json"
+    },
+    "response": {
+      "status": 200,
+      "statusText": "OK",
+      "headers": {
+        "content-type": "application/json"
+      },
+      "body": "[{\"id\":\"int-001\",\"name\":\"Google Sheets\",\"type\":\"GOOGLE\",\"status\":\"ACTIVE\",\"lastSync\":\"2024-01-15T09:00:00.000Z\"},{\"id\":\"int-002\",\"name\":\"HubSpot CRM\",\"type\":\"CRM\",\"status\":\"ACTIVE\",\"lastSync\":\"2024-01-15T08:30:00.000Z\"}]"
+    }
+  }
+]

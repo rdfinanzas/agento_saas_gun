@@ -1,0 +1,24 @@
+# Bun Configuration for Testing
+
+[test]
+# Test file patterns
+include = ["src/**/*.test.ts"]
+exclude = ["node_modules", "dist"]
+
+# Test runner configuration
+preload = ["./src/tests/setup.ts"]
+
+# Coverage configuration
+[coverage]
+enabled = true
+reporter = ["text", "lcov", "html"]
+exclude = [
+  "node_modules/**",
+  "dist/**",
+  "src/tests/**",
+  "**/*.test.ts",
+  "**/*.spec.ts",
+  "**/*.d.ts",
+]
+
+threshold = 70.0  # Minimum coverage percentage

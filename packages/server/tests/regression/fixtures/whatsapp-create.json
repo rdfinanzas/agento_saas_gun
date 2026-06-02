@@ -1,0 +1,22 @@
+[
+  {
+    "id": "whatsapp-create-001",
+    "timestamp": "2024-01-15T10:30:00.000Z",
+    "method": "POST",
+    "url": "http://localhost:3000/api/v1/whatsapp/configs",
+    "path": "/api/v1/whatsapp/configs",
+    "query": {},
+    "headers": {
+      "content-type": "application/json"
+    },
+    "body": "{\"phoneNumberId\":\"987654321098765\",\"accessToken\":\"test-access-token\",\"webhookVerifyToken\":\"test-verify-token\"}",
+    "response": {
+      "status": 201,
+      "statusText": "Created",
+      "headers": {
+        "content-type": "application/json"
+      },
+      "body": "{\"id\":\"wa-002\",\"phoneNumberId\":\"987654321098765\",\"status\":\"PENDING\",\"createdAt\":\"2024-01-15T10:30:00.000Z\"}"
+    }
+  }
+]

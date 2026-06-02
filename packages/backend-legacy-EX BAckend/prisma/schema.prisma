@@ -1,0 +1,964 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Tenant {
+  id               String                @id @default(uuid())
+  slug             String                @unique
+  name             String
+  email            String?               @unique
+  subscriptionTier SubscriptionTier      @default(FREE)
+  quotaMaxRequests Int                   @default(1000)
+  quotaMaxStorage  BigInt                @default(1073741824)
+  settings         Json?
+  integrations     Json                  @default("{}")
+  createdAt        DateTime              @default(now())
+  updatedAt        DateTime              @updatedAt
+  planId           String?
+  contexts         ConversationContext[]
+  conversations    Conversation[]
+  invoices         Invoice[]
+  payments         Payment[]
+  subscription     Subscription?
+  files            TenantFile[]
+  usages           TenantUsage[]
+  users            TenantUser[]
+  plan             Plan?                 @relation(fields: [planId], references: [id])
+  whatsappConfigs  WhatsAppConfig[]
+  agents           Agent[]
+  apiIntegrations  Integration[]
+
+  @@index([subscriptionTier])
+  @@index([planId])
+  @@map("tenants")
+}
+
+model User {
+  id        String       @id @default(uuid())
+  email     String       @unique
+  password  String
+  name      String
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+  tenants   TenantUser[]
+
+  @@map("users")
+}
+
+model TenantUser {
+  id        String     @id @default(uuid())
+  tenantId  String
+  userId    String
+  role      TenantRole @default(MEMBER)
+  createdAt DateTime   @default(now())
+  tenant    Tenant     @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([tenantId, userId])
+  @@index([tenantId])
+  @@map("tenant_users")
+}
+
+model Agent {
+  id          String  @id @default(uuid())
+  tenantId    String
+  name        String
+  description String?
+
+  // Tipo de agente
+  type AgentType @default(INTERNAL)
+
+  // Estado
+  status AgentStatus @default(DRAFT)
+
+  // Identidad
+  role     String?
+  style    String?
+  language String? @default("es")
+
+  // Configuración
+  systemPrompt String? @db.Text
+  instructions String? @db.Text
+
+  // Configuración de acceso
+  accessType AgentAccessType @default(PRIVATE)
+
+  // Workspace (para internos)
+  workspaceEnabled Boolean @default(false)
+
+  // Configuración de herramientas
+  allowedTools String[] @default([])
+  blockedTools String[] @default([])
+
+  // Jerarquía (agente padre)
+  parentId String?
+
+  // timestamps
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // relaciones
+  tenant          Tenant             @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  parent          Agent?             @relation("AgentHierarchy", fields: [parentId], references: [id])
+  children        Agent[]            @relation("AgentHierarchy")
+  whatsappConfigs WhatsAppConfig[]
+  integrations    AgentIntegration[]
+  conversations   Conversation[]
+
+  @@index([tenantId])
+  @@index([type])
+  @@index([status])
+  @@map("agents")
+}
+
+model TenantFile {
+  id        String       @id @default(uuid())
+  tenantId  String
+  name      String
+  path      String
+  mimeType  String?
+  size      BigInt
+  category  FileCategory @default(OTHER)
+  createdAt DateTime     @default(now())
+  metadata  Json?
+  updatedAt DateTime     @updatedAt
+  tenant    Tenant       @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId])
+  @@map("tenant_files")
+}
+
+model ConversationContext {
+  id            String        @id @default(uuid())
+  tenantId      String
+  type          ContextType   @default(CHAT)
+  messages      Json          @default("[]")
+  memory        Json?         @default("{}")
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  tenant        Tenant        @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  memoryEntries MemoryEntry[]
+
+  @@unique([tenantId, type])
+  @@map("conversation_contexts")
+}
+
+model MemoryEntry {
+  id        String              @id @default(uuid())
+  tenantId  String
+  contextId String
+  agentId   String?
+  key       String
+  value     Json
+  category  String?
+  ttl       DateTime?
+  createdAt DateTime            @default(now())
+  updatedAt DateTime            @updatedAt
+  context   ConversationContext @relation(fields: [contextId], references: [id], onDelete: Cascade)
+
+  @@unique([tenantId, contextId, key])
+  @@index([tenantId])
+  @@index([tenantId, contextId])
+  @@index([tenantId, agentId])
+  @@index([category])
+  @@map("memory_entries")
+}
+
+model WhatsAppConfig {
+  id                 String    @id @default(uuid())
+  tenantId           String
+  phoneNumberId      String
+  phoneNumber        String?
+  accessToken        String
+  webhookVerifyToken String
+  isActive           Boolean   @default(true)
+  agentMode          AgentMode @default(LIMITED)
+
+  // AGREGAR: Referencia opcional a Agent
+  agentId String?
+
+  // Configuración del agente (override del Agent)
+  agentInstructions String?
+  knowledgeBase     Json?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  agentLanguage     String?  @default("es")
+  agentName         String?
+  agentRole         String?
+  agentStyle        String?
+
+  // Configuración de WhatsApp
+  greetingMessage String?
+  awayMessage     String?
+
+  // Business config
+  businessDescription String?
+  businessHours       Json?
+  businessName        String?
+  businessPolicies    Json?
+  businessProcedures  Json?
+  businessType        String?
+  faq                 Json?
+  isDraft             Boolean        @default(true)
+  allowedTools        String[]
+  blockedTools        String[]
+  requireApproval     Boolean        @default(false)
+  approvalThreshold   Float?
+  approvalKeywords    String[]
+  baileysSession      String?
+  connectionStatus    String         @default("DISCONNECTED")
+  connectionType      ConnectionType @default(CLOUD_API)
+  conversations       Conversation[]
+  tenant              Tenant         @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  agent               Agent?         @relation(fields: [agentId], references: [id])
+
+  @@unique([tenantId, phoneNumberId])
+  @@index([tenantId])
+  @@index([agentId])
+  @@map("whatsapp_configs")
+}
+
+model Conversation {
+  id       String @id @default(uuid())
+  tenantId String
+  configId String
+
+  // AGREGAR: Referencia opcional a Agent
+  agentId String?
+
+  // Cliente
+  phoneNumber  String
+  contactName  String?
+  contactEmail String?
+
+  // CAMBIAR: Usar enum en lugar de string
+  status ConversationStatus @default(ACTIVE)
+
+  lastMessageAt DateTime?
+  messageCount  Int       @default(0)
+
+  // OpenCode session
+  opencodeSessionId String?
+
+  // Metadatos
+  tags     String[] @default([])
+  duration Int?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  config   WhatsAppConfig @relation(fields: [configId], references: [id])
+  tenant   Tenant         @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  agent    Agent?         @relation(fields: [agentId], references: [id])
+  messages Message[]
+
+  // CAMBIAR: Unique constraint ahora incluye configId
+  @@unique([tenantId, phoneNumber, configId])
+  @@index([agentId])
+  @@index([status])
+  @@index([tenantId])
+  @@map("conversations")
+}
+
+model Message {
+  id             String @id @default(uuid())
+  tenantId       String
+  conversationId String
+
+  // Identificación
+  messageId String?
+  inReplyTo String?
+
+  // CAMBIAR: Usar enums
+  direction MessageDirection
+  type      MessageType      @default(TEXT)
+  content   String?          @db.Text
+
+  // Metadata
+  metadata Json?
+
+  // CAMBIAR: Usar enum
+  status MessageStatus @default(PENDING)
+
+  createdAt DateTime @default(now())
+
+  conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+  @@index([conversationId])
+  @@index([tenantId])
+  @@index([direction])
+  @@map("messages")
+}
+
+model TenantUsage {
+  id               String   @id @default(uuid())
+  tenantId         String
+  date             DateTime @db.Date
+  requestsCount    Int      @default(0)
+  whatsappMessages Int      @default(0)
+  createdAt        DateTime @default(now())
+  tenant           Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@unique([tenantId, date])
+  @@map("tenant_usages")
+}
+
+model SimulationSession {
+  id        String          @id @default(uuid())
+  tenantId  String
+  agentId   String
+  config    Json            @default("{}")
+  messages  Json            @default("[]")
+  status    String          @default("active")
+  metrics   Json            @default("{}")
+  startedAt DateTime        @default(now())
+  endedAt   DateTime?
+  logs      SimulationLog[]
+
+  @@index([tenantId])
+  @@index([agentId])
+  @@map("simulation_sessions")
+}
+
+model SimulationLog {
+  id        String            @id @default(uuid())
+  sessionId String
+  event     String
+  details   Json              @default("{}")
+  timestamp DateTime          @default(now())
+  session   SimulationSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@index([sessionId])
+  @@map("simulation_logs")
+}
+
+model ScheduledTask {
+  id             String          @id @default(uuid())
+  tenantId       String
+  name           String
+  cronExpression String
+  taskType       String
+  taskConfig     Json            @default("{}")
+  agentId        String?
+  enabled        Boolean         @default(true)
+  timezone       String          @default("America/Mexico_City")
+  lastRunAt      DateTime?
+  nextRunAt      DateTime?
+  runCount       Int             @default(0)
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  executions     TaskExecution[]
+
+  @@index([tenantId])
+  @@index([enabled])
+  @@map("scheduled_tasks")
+}
+
+model TaskExecution {
+  id          String        @id @default(uuid())
+  taskId      String
+  tenantId    String
+  status      String        @default("pending")
+  startedAt   DateTime      @default(now())
+  completedAt DateTime?
+  result      Json?
+  error       String?
+  task        ScheduledTask @relation(fields: [taskId], references: [id], onDelete: Cascade)
+
+  @@index([taskId])
+  @@index([tenantId])
+  @@index([status])
+  @@map("task_executions")
+}
+
+model ApiConnector {
+  id               String   @id @default(uuid())
+  tenantId         String
+  name             String
+  description      String?
+  baseUrl          String
+  authType         String   @default("none")
+  authConfig       Json?    @default("{}")
+  tools            Json     @default("[]")
+  rawDocumentation Json?
+  isActive         Boolean  @default(true)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  @@index([tenantId])
+  @@index([isActive])
+  @@map("api_connectors")
+}
+
+model Integration {
+  id       String @id @default(uuid())
+  tenantId String
+
+  name String
+  type IntegrationType
+
+  // Configuración
+  credentials String  @db.Text
+  baseUrl     String?
+  webhookUrl  String?
+
+  // Estado
+  status IntegrationStatus @default(PENDING)
+
+  // timestamps
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // relaciones
+  tenant            Tenant             @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  agentIntegrations AgentIntegration[]
+
+  @@unique([tenantId, name])
+  @@index([tenantId])
+  @@map("integrations")
+}
+
+model AgentIntegration {
+  id            String @id @default(uuid())
+  agentId       String
+  integrationId String
+
+  // Herramientas generadas
+  tools Json @default("[]")
+
+  // Configuración específica
+  config Json?
+
+  // Estado
+  status IntegrationStatus @default(ACTIVE)
+
+  // timestamps
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // relaciones
+  agent       Agent       @relation(fields: [agentId], references: [id], onDelete: Cascade)
+  integration Integration @relation(fields: [integrationId], references: [id], onDelete: Cascade)
+
+  @@unique([agentId, integrationId])
+  @@map("agent_integrations")
+}
+
+model PendingResponse {
+  id               String    @id @default(uuid())
+  tenantId         String
+  conversationId   String
+  agentId          String
+  proposedResponse String
+  reason           String?
+  confidence       Decimal?  @db.Decimal(3, 2)
+  status           String    @default("PENDING")
+  reviewedBy       String?
+  reviewedAt       DateTime?
+  reviewNotes      String?
+  createdAt        DateTime  @default(now())
+  expiresAt        DateTime
+
+  @@index([tenantId, status])
+  @@index([status])
+  @@map("pending_responses")
+}
+
+model ApprovalFeedback {
+  id               String   @id @default(uuid())
+  tenantId         String
+  responseId       String
+  conversationId   String
+  proposedResponse String
+  rejectionReason  String?
+  createdAt        DateTime @default(now())
+
+  @@index([tenantId])
+  @@map("approval_feedbacks")
+}
+
+model MarketplaceSkill {
+  id            String           @id @default(uuid())
+  name          String
+  description   String
+  category      String
+  author        String
+  authorId      String
+  version       String           @default("1.0.0")
+  content       String
+  command       String?
+  tags          String[]
+  status        String           @default("PUBLISHED")
+  downloads     Int              @default(0)
+  rating        Decimal          @default(0) @db.Decimal(3, 2)
+  ratingsCount  Int              @default(0)
+  isVerified    Boolean          @default(false)
+  isOfficial    Boolean          @default(false)
+  compatibility String[]
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+  installations InstalledSkill[]
+  reviews       SkillReview[]
+
+  @@index([category])
+  @@index([authorId])
+  @@index([status])
+  @@map("marketplace_skills")
+}
+
+model SkillReview {
+  id        String           @id @default(uuid())
+  skillId   String
+  userId    String
+  userName  String
+  rating    Int
+  comment   String?
+  createdAt DateTime         @default(now())
+  skill     MarketplaceSkill @relation(fields: [skillId], references: [id], onDelete: Cascade)
+
+  @@unique([skillId, userId])
+  @@index([skillId])
+  @@map("skill_reviews")
+}
+
+model InstalledSkill {
+  id                 String           @id @default(uuid())
+  tenantId           String
+  marketplaceSkillId String
+  localSkillId       String
+  installedVersion   String
+  createdAt          DateTime         @default(now())
+  marketplaceSkill   MarketplaceSkill @relation(fields: [marketplaceSkillId], references: [id], onDelete: Cascade)
+
+  @@unique([tenantId, marketplaceSkillId])
+  @@index([tenantId])
+  @@map("installed_skills")
+}
+
+model KnowledgeEmbedding {
+  id        String   @id @default(uuid())
+  tenantId  String
+  content   String
+  embedding String
+  source    String
+  metadata  Json     @default("{}")
+  createdAt DateTime @default(now())
+
+  @@index([tenantId])
+  @@index([tenantId, source])
+  @@map("knowledge_embeddings")
+}
+
+model KnowledgeEntry {
+  id       String  @id @default(uuid())
+  tenantId String
+  agentId  String? // Null = global del tenant
+
+  // Contenido
+  type    KnowledgeType
+  title   String
+  content String        @db.Text
+  source  String?
+
+  // Metadatos
+  tags     String[] @default([])
+  metadata Json?
+
+  // Estado
+  status String @default("ACTIVE")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([tenantId])
+  @@index([agentId])
+  @@index([type])
+  @@map("knowledge_entries")
+}
+
+model Subscription {
+  id                   String             @id @default(uuid())
+  tenantId             String             @unique
+  planId               String
+  planName             String
+  tier                 SubscriptionTier   @default(FREE)
+  status               SubscriptionStatus @default(PENDING)
+  cancelAtPeriodEnd    Boolean            @default(false)
+  cancelledAt          DateTime?
+  pausedAt             DateTime?
+  currentPeriodStart   DateTime?
+  currentPeriodEnd     DateTime?
+  gateway              String             @default("MERCADOPAGO")
+  gatewayCustomerId    String?
+  gatewayPreapprovalId String?
+  autoRenew            Boolean            @default(true)
+  trialEnd             DateTime?
+  prorationCredit      Float              @default(0)
+  createdAt            DateTime           @default(now())
+  updatedAt            DateTime           @updatedAt
+  dunningAttempts      DunningAttempt[]
+  invoices             Invoice[]
+  tenant               Tenant             @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId])
+  @@index([status])
+  @@index([gatewayPreapprovalId])
+  @@map("subscriptions")
+}
+
+model Payment {
+  id               String    @id @default(uuid())
+  tenantId         String
+  gateway          String    @default("MERCADOPAGO")
+  gatewayPaymentId String    @unique
+  amount           Float
+  currency         String    @default("MXN")
+  status           String    @default("PENDING")
+  statusDetail     String?
+  payerEmail       String?
+  payerId          String?
+  metadata         Json?
+  refundedAt       DateTime?
+  refundAmount     Float?
+  paidAt           DateTime?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+  tenant           Tenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId])
+  @@index([status])
+  @@map("payments")
+}
+
+model Invoice {
+  id               String        @id @default(uuid())
+  tenantId         String
+  subscriptionId   String
+  number           String        @unique
+  amount           Float
+  currency         String        @default("MXN")
+  tax              Float?
+  discount         Float?
+  couponId         String?
+  status           InvoiceStatus @default(OPEN)
+  paymentMethod    String?
+  paymentReference String?
+  paidAt           DateTime?
+  dueDate          DateTime?
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+  coupon           Coupon?       @relation(fields: [couponId], references: [id])
+  subscription     Subscription  @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
+  tenant           Tenant        @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId])
+  @@index([status])
+  @@map("invoices")
+}
+
+model Coupon {
+  id            String    @id @default(cuid())
+  code          String    @unique
+  description   String?
+  discountType  String
+  discountValue Float
+  maxUses       Int?
+  usedCount     Int       @default(0)
+  validFrom     DateTime
+  validUntil    DateTime
+  active        Boolean   @default(true)
+  planIds       String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  invoices      Invoice[]
+
+  @@index([code])
+  @@index([active])
+  @@map("coupons")
+}
+
+model DunningAttempt {
+  id             String       @id @default(cuid())
+  subscriptionId String
+  attemptNumber  Int
+  status         String
+  error          String?
+  attemptedAt    DateTime     @default(now())
+  nextRetryAt    DateTime?
+  subscription   Subscription @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
+
+  @@index([subscriptionId])
+  @@index([status])
+  @@map("dunning_attempts")
+}
+
+model AIProvider {
+  id           String    @id @default(uuid())
+  provider     String    @unique
+  displayName  String
+  description  String?
+  isActive     Boolean   @default(true)
+  isDefault    Boolean   @default(false)
+  apiKeyName   String
+  configSchema Json      @default("{}")
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  models       AIModel[]
+
+  @@index([isActive])
+  @@map("ai_providers")
+}
+
+model AIModel {
+  id                String     @id @default(uuid())
+  providerId        String
+  modelId           String
+  displayName       String
+  description       String?
+  isActive          Boolean    @default(true)
+  maxTokens         Int?
+  supportsVision    Boolean    @default(false)
+  supportsTools     Boolean    @default(true)
+  supportsStreaming Boolean    @default(true)
+  costPer1kTokens   Float?
+  createdAt         DateTime   @default(now())
+  updatedAt         DateTime   @updatedAt
+  provider          AIProvider @relation(fields: [providerId], references: [id], onDelete: Cascade)
+
+  @@unique([providerId, modelId])
+  @@index([isActive])
+  @@map("ai_models")
+}
+
+model Plan {
+  id           String           @id @default(uuid())
+  tier         SubscriptionTier @unique
+  name         String
+  description  String?
+  priceMonthly Float            @default(0)
+  priceYearly  Float?
+  currency     String           @default("USD")
+  isActive     Boolean          @default(true)
+  features     Json             @default("[]")
+  limits       Json             @default("{}")
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
+  tenants      Tenant[]
+
+  @@index([isActive])
+  @@index([tier])
+  @@map("plans")
+}
+
+model AccomplishTask {
+  id            String          @id @default(uuid())
+  tenantId      String
+  userId        String? // Usuario que creó la tarea
+  prompt        String
+  status        TaskStatus      @default(QUEUED)
+  sessionId     String?
+  messages      Json            @default("[]")
+  result        Json?
+  error         String?
+  workspacePath String?
+  createdAt     DateTime        @default(now())
+  startedAt     DateTime?
+  completedAt   DateTime?
+  files         WorkspaceFile[]
+
+  @@index([tenantId])
+  @@index([userId])
+  @@index([status])
+  @@index([sessionId])
+  @@index([createdAt])
+  @@map("accomplish_tasks")
+}
+
+model WorkspaceFile {
+  id        String          @id @default(uuid())
+  tenantId  String
+  taskId    String?
+  type      FileType        @default(USER)
+  path      String
+  name      String
+  size      Int
+  expiresAt DateTime?
+  createdAt DateTime        @default(now())
+  updatedAt DateTime        @updatedAt
+  task      AccomplishTask? @relation(fields: [taskId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId])
+  @@index([taskId])
+  @@index([type])
+  @@index([expiresAt])
+  @@map("workspace_files")
+}
+
+enum SubscriptionTier {
+  FREE
+  PRO
+  ENTERPRISE
+}
+
+enum TenantRole {
+  OWNER
+  ADMIN
+  MEMBER
+}
+
+enum FileCategory {
+  DOCUMENT
+  SPREADSHEET
+  IMAGE
+  ARCHIVE
+  OTHER
+  GOOGLE_SHEET
+}
+
+enum ContextType {
+  CHAT
+  WHATSAPP_AGENT
+  WORKSPACE
+}
+
+enum AgentMode {
+  FULL
+  LIMITED
+}
+
+enum ConnectionType {
+  CLOUD_API
+  BAILEYS
+}
+
+enum SubscriptionStatus {
+  PENDING
+  ACTIVE
+  PAUSED
+  PAST_DUE
+  CANCELLED
+  EXPIRED
+}
+
+enum PaymentStatus {
+  PENDING
+  APPROVED
+  AUTHORIZED
+  IN_PROCESS
+  REJECTED
+  CANCELLED
+  REFUNDED
+  CHARGED_BACK
+}
+
+enum InvoiceStatus {
+  DRAFT
+  OPEN
+  PAID
+  VOID
+  UNCOLLECTIBLE
+}
+
+enum TaskStatus {
+  QUEUED
+  RUNNING
+  COMPLETED
+  FAILED
+  CANCELLED
+}
+
+enum FileType {
+  USER
+  TASK
+  TEMP
+}
+
+// ============================================
+// NEW ENUMS - AGENTES V2
+// ============================================
+
+enum AgentType {
+  MASTER
+  INTERNAL
+  EXTERNAL
+}
+
+enum AgentStatus {
+  DRAFT
+  ACTIVE
+  PAUSED
+  ARCHIVED
+}
+
+enum AgentAccessType {
+  PRIVATE
+  SHARED
+  PUBLIC
+}
+
+enum ConversationStatus {
+  ACTIVE
+  PENDING_HUMAN
+  RESOLVED
+  CLOSED
+  ARCHIVED
+}
+
+enum MessageDirection {
+  INCOMING
+  OUTGOING
+}
+
+enum MessageType {
+  TEXT
+  IMAGE
+  AUDIO
+  VIDEO
+  DOCUMENT
+  LOCATION
+  CONTACTS
+  BUTTONS
+  LIST
+}
+
+enum MessageStatus {
+  PENDING
+  PROCESSING
+  SENT
+  DELIVERED
+  READ
+  FAILED
+}
+
+enum IntegrationType {
+  CRM
+  ERP
+  ECOMMERCE
+  ACCOUNTING
+  BANK
+  CUSTOM_API
+  GOOGLE
+  MICROSOFT
+}
+
+enum IntegrationStatus {
+  PENDING
+  ACTIVE
+  ERROR
+  DISABLED
+}
+
+enum KnowledgeType {
+  FAQ
+  POLICY
+  DOCUMENT
+  PROCEDURE
+  PRODUCT
+  PRICING
+  OTHER
+}

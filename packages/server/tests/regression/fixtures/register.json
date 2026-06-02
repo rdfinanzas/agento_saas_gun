@@ -1,0 +1,22 @@
+[
+  {
+    "id": "register-001",
+    "timestamp": "2024-01-15T10:05:00.000Z",
+    "method": "POST",
+    "url": "http://localhost:3000/api/v1/auth/register",
+    "path": "/api/v1/auth/register",
+    "query": {},
+    "headers": {
+      "content-type": "application/json"
+    },
+    "body": "{\"email\":\"newuser@example.com\",\"password\":\"NewPassword123!\",\"name\":\"New User\"}",
+    "response": {
+      "status": 201,
+      "statusText": "Created",
+      "headers": {
+        "content-type": "application/json"
+      },
+      "body": "{\"success\":true,\"token\":\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.newuser\",\"refreshToken\":\"refresh-token-newuser\",\"user\":{\"id\":\"user-002\",\"email\":\"newuser@example.com\",\"name\":\"New User\",\"role\":\"OWNER\",\"tenantId\":\"tenant-002\"}}"
+    }
+  }
+]

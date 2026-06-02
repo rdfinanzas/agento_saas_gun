@@ -1,0 +1,42 @@
+[
+  {
+    "id": "agents-chat-001",
+    "timestamp": "2024-01-15T10:20:00.000Z",
+    "method": "POST",
+    "url": "http://localhost:3000/api/v1/chat",
+    "path": "/api/v1/chat",
+    "query": {},
+    "headers": {
+      "content-type": "application/json"
+    },
+    "body": "{\"agentId\":\"agent-001\"}",
+    "response": {
+      "status": 201,
+      "statusText": "Created",
+      "headers": {
+        "content-type": "application/json"
+      },
+      "body": "{\"sessionId\":\"session-001\",\"agentId\":\"agent-001\",\"status\":\"ACTIVE\",\"createdAt\":\"2024-01-15T10:20:00.000Z\"}"
+    }
+  },
+  {
+    "id": "agents-chat-002",
+    "timestamp": "2024-01-15T10:20:01.000Z",
+    "method": "POST",
+    "url": "http://localhost:3000/api/v1/chat/session-001/message",
+    "path": "/api/v1/chat/session-001/message",
+    "query": {},
+    "headers": {
+      "content-type": "application/json"
+    },
+    "body": "{\"content\":\"Hola, ¿cómo estás?\"}",
+    "response": {
+      "status": 200,
+      "statusText": "OK",
+      "headers": {
+        "content-type": "application/json"
+      },
+      "body": "{\"messageId\":\"msg-001\",\"content\":\"¡Hola! Estoy muy bien, gracias por preguntar. ¿En qué puedo ayudarte hoy?\",\"role\":\"assistant\",\"createdAt\":\"2024-01-15T10:20:02.000Z\"}"
+    }
+  }
+]

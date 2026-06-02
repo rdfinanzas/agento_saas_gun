@@ -1,0 +1,21 @@
+[
+  {
+    "id": "billing-view-001",
+    "timestamp": "2024-01-15T10:35:00.000Z",
+    "method": "GET",
+    "url": "http://localhost:3000/api/v1/billing",
+    "path": "/api/v1/billing",
+    "query": {},
+    "headers": {
+      "content-type": "application/json"
+    },
+    "response": {
+      "status": 200,
+      "statusText": "OK",
+      "headers": {
+        "content-type": "application/json"
+      },
+      "body": "{\"subscription\":{\"id\":\"sub-001\",\"plan\":\"PRO\",\"status\":\"ACTIVE\",\"currentPeriodStart\":\"2024-01-01T00:00:00.000Z\",\"currentPeriodEnd\":\"2024-02-01T00:00:00.000Z\"},\"usage\":{\"messagesUsed\":1500,\"messagesLimit\":5000,\"storageUsed\":2.5,\"storageLimit\":10}}"
+    }
+  }
+]

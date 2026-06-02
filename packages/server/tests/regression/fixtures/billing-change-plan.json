@@ -1,0 +1,22 @@
+[
+  {
+    "id": "billing-change-001",
+    "timestamp": "2024-01-15T10:40:00.000Z",
+    "method": "POST",
+    "url": "http://localhost:3000/api/v1/billing/change-plan",
+    "path": "/api/v1/billing/change-plan",
+    "query": {},
+    "headers": {
+      "content-type": "application/json"
+    },
+    "body": "{\"plan\":\"ENTERPRISE\"}",
+    "response": {
+      "status": 200,
+      "statusText": "OK",
+      "headers": {
+        "content-type": "application/json"
+      },
+      "body": "{\"success\":true,\"subscription\":{\"id\":\"sub-001\",\"plan\":\"ENTERPRISE\",\"status\":\"ACTIVE\",\"updatedAt\":\"2024-01-15T10:40:00.000Z\"}}"
+    }
+  }
+]

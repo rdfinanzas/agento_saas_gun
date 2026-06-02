@@ -1,0 +1,21 @@
+[
+  {
+    "id": "knowledge-list-001",
+    "timestamp": "2024-01-15T10:50:00.000Z",
+    "method": "GET",
+    "url": "http://localhost:3000/api/v1/knowledge",
+    "path": "/api/v1/knowledge",
+    "query": {},
+    "headers": {
+      "content-type": "application/json"
+    },
+    "response": {
+      "status": 200,
+      "statusText": "OK",
+      "headers": {
+        "content-type": "application/json"
+      },
+      "body": "[{\"id\":\"kb-001\",\"title\":\"Product FAQ\",\"type\":\"FAQ\",\"status\":\"ACTIVE\",\"entries\":25,\"updatedAt\":\"2024-01-14T00:00:00.000Z\"},{\"id\":\"kb-002\",\"title\":\"Company Policies\",\"type\":\"POLICY\",\"status\":\"ACTIVE\",\"entries\":10,\"updatedAt\":\"2024-01-10T00:00:00.000Z\"}]"
+    }
+  }
+]

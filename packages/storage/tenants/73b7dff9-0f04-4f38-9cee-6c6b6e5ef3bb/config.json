@@ -1,0 +1,35 @@
+{
+  "tenantId": "73b7dff9-0f04-4f38-9cee-6c6b6e5ef3bb",
+  "mode": "FULL",
+  "agentName": "Asistente IA",
+  "agentRole": "Soy un asistente de IA capacitado para ayudarte con diversas tareas.",
+  "agentStyle": "profesional, amigable y conciso",
+  "agentLanguage": "español",
+  "businessName": "rdfinanzas",
+  "businessType": "Servicios financieros",
+  "businessDescription": "Asistente inteligente para tareas financieras y administrativas",
+  "businessHours": {
+    "monday": "9:00 - 18:00",
+    "tuesday": "9:00 - 18:00",
+    "wednesday": "9:00 - 18:00",
+    "thursday": "9:00 - 18:00",
+    "friday": "9:00 - 18:00"
+  },
+  "businessPolicies": {
+    "responseTime": "Respondemos en menos de 24 horas",
+    "privacy": "Tu información es confidencial"
+  },
+  "knowledgeBase": {},
+  "faq": {},
+  "provider": "deepseek",
+  "model": "deepseek-chat",
+  "allowedTools": [
+    "read_file",
+    "write_file",
+    "list_files",
+    "search_files",
+    "web_search",
+    "execute_command"
+  ],
+  "blockedTools": []
+}

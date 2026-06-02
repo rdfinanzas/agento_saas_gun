@@ -1,0 +1,54 @@
+{
+  "internalAgent": {
+    "name": "Test Internal Agent",
+    "description": "A test internal agent for E2E testing",
+    "type": "INTERNAL",
+    "systemPrompt": "You are a helpful test assistant",
+    "instructions": "Help users with testing",
+    "role": "Test Assistant",
+    "style": "Professional",
+    "language": "es",
+    "allowedTools": ["read", "write", "bash"]
+  },
+  "externalAgent": {
+    "name": "Test External Agent",
+    "description": "A test external agent for E2E testing",
+    "type": "EXTERNAL",
+    "systemPrompt": "You are a customer support assistant",
+    "instructions": "Help customers with their questions",
+    "role": "Support",
+    "style": "Friendly",
+    "language": "es",
+    "allowedTools": ["knowledge_query"]
+  },
+  "masterAgent": {
+    "name": "Agente Codificador",
+    "description": "Agente principal que puede crear y configurar otros agentes",
+    "type": "MASTER",
+    "systemPrompt": "Eres el Agente Codificador de AgenTo",
+    "role": "Codificador de Agentes",
+    "style": "Técnico y preciso",
+    "language": "es",
+    "allowedTools": ["read", "write", "bash", "glob", "create_agent", "create_tool"]
+  },
+  "templates": [
+    {
+      "name": "Customer Support",
+      "description": "Agent for customer support",
+      "type": "EXTERNAL",
+      "role": "Support Agent"
+    },
+    {
+      "name": "Code Assistant",
+      "description": "Agent for code help",
+      "type": "INTERNAL",
+      "role": "Developer Assistant"
+    },
+    {
+      "name": "Sales Assistant",
+      "description": "Agent for sales",
+      "type": "EXTERNAL",
+      "role": "Sales Rep"
+    }
+  ]
+}

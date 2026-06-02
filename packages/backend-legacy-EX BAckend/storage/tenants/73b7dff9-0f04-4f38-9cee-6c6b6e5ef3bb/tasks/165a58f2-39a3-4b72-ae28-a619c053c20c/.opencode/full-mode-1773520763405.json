@@ -1,0 +1,78 @@
+{
+  "model": "deepseek/deepseek-chat",
+  "apiKey": "sk-560fbfd10e5b49d487bef967c978b744",
+  "apiUrl": "https://api.deepseek.com",
+  "agent": {
+    "name": "agento-agent",
+    "description": "Agente de IA multi-propósito para AgenTo SaaS",
+    "instructions": "Eres un asistente de IA útil y capaz."
+  },
+  "tools": {
+    "bash": {
+      "enabled": true,
+      "timeout": 30000
+    },
+    "write": {
+      "enabled": true
+    },
+    "edit": {
+      "enabled": true
+    },
+    "read": {
+      "enabled": true
+    },
+    "glob": {
+      "enabled": true
+    },
+    "grep": {
+      "enabled": true
+    },
+    "list": {
+      "enabled": true
+    },
+    "webfetch": {
+      "enabled": true,
+      "timeout": 30000
+    },
+    "websearch": {
+      "enabled": true,
+      "timeout": 30000
+    },
+    "execute_code": {
+      "enabled": true,
+      "languages": [
+        "python",
+        "javascript",
+        "typescript"
+      ],
+      "timeout": 60000
+    },
+    "excel_read": {
+      "enabled": true
+    },
+    "excel_write": {
+      "enabled": true
+    },
+    "sheets_read": {
+      "enabled": true
+    },
+    "sheets_write": {
+      "enabled": true
+    },
+    "knowledge_query": {
+      "enabled": true
+    }
+  },
+  "security": {
+    "maxIterations": 50,
+    "maxTokens": 100000,
+    "timeout": 600000,
+    "allowedPaths": [
+      "storage\\tenants\\73b7dff9-0f04-4f38-9cee-6c6b6e5ef3bb\\tasks\\165a58f2-39a3-4b72-ae28-a619c053c20c"
+    ]
+  },
+  "output": {
+    "format": "json",
+    "streaming": true
+  }
+}

@@ -1,0 +1,41 @@
+[
+  {
+    "id": "login-001",
+    "timestamp": "2024-01-15T10:00:00.000Z",
+    "method": "POST",
+    "url": "http://localhost:3000/api/v1/auth/login",
+    "path": "/api/v1/auth/login",
+    "query": {},
+    "headers": {
+      "content-type": "application/json"
+    },
+    "body": "{\"email\":\"test@example.com\",\"password\":\"TestPassword123!\"}",
+    "response": {
+      "status": 200,
+      "statusText": "OK",
+      "headers": {
+        "content-type": "application/json"
+      },
+      "body": "{\"success\":true,\"token\":\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.test\",\"refreshToken\":\"refresh-token-test\",\"user\":{\"id\":\"user-001\",\"email\":\"test@example.com\",\"name\":\"Test User\",\"role\":\"MEMBER\",\"tenantId\":\"tenant-001\"}}"
+    }
+  },
+  {
+    "id": "login-002",
+    "timestamp": "2024-01-15T10:00:01.000Z",
+    "method": "GET",
+    "url": "http://localhost:3000/api/v1/auth/me",
+    "path": "/api/v1/auth/me",
+    "query": {},
+    "headers": {
+      "content-type": "application/json"
+    },
+    "response": {
+      "status": 200,
+      "statusText": "OK",
+      "headers": {
+        "content-type": "application/json"
+      },
+      "body": "{\"id\":\"user-001\",\"email\":\"test@example.com\",\"name\":\"Test User\",\"role\":\"MEMBER\",\"tenantId\":\"tenant-001\",\"createdAt\":\"2024-01-01T00:00:00.000Z\"}"
+    }
+  }
+]

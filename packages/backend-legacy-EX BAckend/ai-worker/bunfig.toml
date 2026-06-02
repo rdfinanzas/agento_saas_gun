@@ -1,0 +1,37 @@
+# Bun configuration for @agento/ai-worker
+
+[install]
+# Use exact versions for reproducibility
+exact = true
+
+[install.scopes]
+# Configure npm scopes if needed
+
+[run]
+# Silent mode for cleaner output
+silent = false
+
+# Development settings
+[dev]
+# Enable hot reloading
+hot = true
+
+# Build settings
+[build]
+# Target bun runtime
+target = "bun"
+
+# Minify for production
+minify = false
+
+# Generate source maps
+sourcemap = "external"
+
+# Test settings
+[test]
+# Use bun test runner
+preload = ["src/index.ts"]
+
+# Define environment variables
+[define]
+"process.env.NODE_ENV" = "\"development\""
