@@ -34,7 +34,46 @@ class EvolutionManagementController {
    */
   async createInstance(c: Context) {
     try {
-      const tenantId = c.get("tenantId") as string
+    // === PLAN LIMIT VALIDATION ===
+    const tenantId = c.get("tenantId") as string
+    try {
+      const { db } = await import("../../../db")
+      const { tenants, plans, whatsappConfigs } = await import("../../../db/schema")
+      const { eq } = await import("drizzle-orm")
+
+      const tenant = await db.query.tenants.findFirst({
+        where: eq(tenants.id, tenantId),
+      })
+
+      if (tenant && tenant.planId) {
+        const plan = await db.query.plans.findFirst({
+          where: eq(plans.id, tenant.planId),
+        })
+
+        if (plan && plan.limits) {
+          const limits = plan.limits as any
+          const maxChannels = limits.maxChannels || 1
+
+          const currentConfigs = await db.query.whatsappConfigs.findMany({
+            where: eq(whatsappConfigs.tenantId, tenantId),
+          })
+
+          if (currentConfigs.length >= maxChannels) {
+            return c.json({
+              error: "Channel limit reached",
+              message: "Tu plan permite " + maxChannels + " canal(es). Ya tenes " + currentConfigs.length + " canal(es). Actualiza tu plan para agregar mas.",
+              current: currentConfigs.length,
+              max: maxChannels,
+              planName: plan.name,
+            }, 403)
+          }
+        }
+      }
+    } catch (limitErr: any) {
+      console.warn("[CreateInstance] Could not check plan limits:", limitErr?.message)
+    }
+    // === END PLAN LIMIT VALIDATION ===
+
       const body = await c.req.json()
       const instanceName = body.instanceName || `tenant-${tenantId.substring(0, 8)}`
       const agentId = body.agentId || null

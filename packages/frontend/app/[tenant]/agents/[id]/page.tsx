@@ -289,8 +289,8 @@ export default function AgentDetailPage() {
       if (!token) return;
 
       const response = await api.post<{ response: string; conversationHistory: any[] }>(
-        '/opencode/agent-identity/sandbox/test',
-        { message: sandboxMessage },
+        '/whatsapp/agents/' + agentId + '/chat',
+        { message: sandboxMessage, history: sandboxHistory },
         token
       );
 
@@ -750,9 +750,9 @@ export default function AgentDetailPage() {
         <TabsContent value="sandbox">
           <Card>
             <CardHeader>
-              <CardTitle>Modo Sandbox / Entrenamiento</CardTitle>
+              <CardTitle>Chat con el Agente</CardTitle>
               <CardDescription>
-                Prueba el agente antes de activarlo en producción
+                Prueba el agente en modo sandbox antes de activarlo en producción
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -765,17 +765,44 @@ export default function AgentDetailPage() {
                 ) : (
                   <div className="space-y-4">
                     {sandboxHistory.map((msg, i) => (
-                      <div
-                        key={i}
-                        className={`flex ${msg.role === 'user' ? 'justify-start' : 'justify-end'}`}
-                      >
+                      <div key={i}>
                         <div
-                          className={`max-w-[70%] rounded-lg p-3 ${
-                            msg.role === 'user' ? 'bg-background' : 'bg-primary text-primary-foreground'
-                          }`}
+                          className={`flex ${msg.role === 'user' ? 'justify-start' : 'justify-end'}`}
                         >
-                          <p className="text-sm">{msg.content}</p>
+                          <div
+                            className={`max-w-[70%] rounded-lg p-3 ${
+                              msg.role === 'user' ? 'bg-background' : 'bg-primary text-primary-foreground'
+                            }`}
+                          >
+                            <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
+                          </div>
                         </div>
+                        {msg.role === 'assistant' && i === sandboxHistory.length - 1 && (
+                          <div className="flex justify-end gap-1 mt-1">
+                            <button
+                              onClick={() => {
+                                const newHistory = [...sandboxHistory];
+                                newHistory[i] = { ...msg, feedback: 'correct' };
+                                setSandboxHistory(newHistory);
+                              }}
+                              className="text-xs px-2 py-1 rounded text-green-600 hover:bg-green-50"
+                              title="Respuesta correcta"
+                            >
+                              ✓ Correcta
+                            </button>
+                            <button
+                              onClick={() => {
+                                const newHistory = [...sandboxHistory];
+                                newHistory[i] = { ...msg, feedback: 'incorrect' };
+                                setSandboxHistory(newHistory);
+                              }}
+                              className="text-xs px-2 py-1 rounded text-red-600 hover:bg-red-50"
+                              title="Respuesta incorrecta"
+                            >
+                              ✗ Incorrecta
+                            </button>
+                          </div>
+                        )}
                       </div>
                     ))}
                   </div>

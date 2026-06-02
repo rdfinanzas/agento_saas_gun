@@ -161,6 +161,184 @@ whatsappRoutes.get("/conversations/:conversationId/messages", async (c) => {
 })
 
 
+
+
+// Channel count for plan limit checking
+whatsappRoutes.get("/channels/count", async (c) => {
+  const tenantId = c.get("tenantId") as string
+  const { db } = await import("../../../db")
+  const { whatsappConfigs, tenants, plans } = await import("../../../db/schema")
+  const { eq } = await import("drizzle-orm")
+
+  try {
+    const configs = await db.query.whatsappConfigs.findMany({
+      where: eq(whatsappConfigs.tenantId, tenantId),
+    })
+
+    let maxChannels = 1
+    let planName = "Free"
+    try {
+      const tenant = await db.query.tenants.findFirst({ where: eq(tenants.id, tenantId) })
+      if (tenant && tenant.planId) {
+        const plan = await db.query.plans.findFirst({ where: eq(plans.id, tenant.planId) })
+        if (plan && plan.limits) {
+          maxChannels = (plan.limits as any).maxChannels || 1
+          planName = plan.name
+        }
+      }
+    } catch (e) {}
+
+    return c.json({
+      current: configs.length,
+      max: maxChannels,
+      planName,
+      canCreateMore: configs.length < maxChannels,
+    })
+  } catch (error) {
+    return c.json({ error: "Failed to get channel count" }, 500)
+  }
+})
+
+// === AGENT CHAT (for internal agents and sandbox) ===
+whatsappRoutes.post("/agents/:agentId/chat", async (c) => {
+  const tenantId = c.get("tenantId") as string
+  const agentId = c.req.param("agentId")
+  const body = await c.req.json()
+  const { message, history } = body
+
+  if (!message) {
+    return c.json({ error: "Message is required" }, 400)
+  }
+
+  const { db } = await import("../../../db")
+  const { agents, tenants } = await import("../../../db/schema")
+  const { eq } = await import("drizzle-orm")
+  const { aiService } = await import("../../../modules/ai/ai.service")
+
+  try {
+    // Find agent
+    const agent = await db.query.agents.findFirst({
+      where: (a: any, { and }: any) => and(eq(a.id, agentId), eq(a.tenantId, tenantId)),
+    })
+
+    if (!agent) {
+      return c.json({ error: "Agent not found" }, 404)
+    }
+
+    // Load tenant masterPrompt
+    let masterPrompt = ""
+    try {
+      const tenant = await db.query.tenants.findFirst({
+        where: eq(tenants.id, tenantId),
+      })
+      if (tenant && tenant.masterPrompt) {
+        masterPrompt = tenant.masterPrompt
+      }
+    } catch (e) {}
+
+    // Load knowledge base
+    const { knowledgeEntries } = await import("../../../db/schema")
+    let knowledgeContext = ""
+    try {
+      const entries = await db.query.knowledgeEntries.findMany({
+        where: eq(knowledgeEntries.tenantId, tenantId),
+        limit: 10,
+      })
+      if (entries.length > 0) {
+        knowledgeContext = "\n\n--- BASE DE CONOCIMIENTO ---\n" +
+          entries.map((e: any) => "[" + e.type + "] " + e.title + ": " + e.content).join("\n\n")
+      }
+    } catch (e) {}
+
+    // Build system prompt
+    const parts: string[] = []
+    if (masterPrompt) {
+      parts.push("=== REGLAS OBLIGATORIAS DEL SISTEMA ===\nEstas reglas son de cumplimiento OBLIGATORIO.\n" + masterPrompt + "\n=== FIN REGLAS OBLIGATORIAS ===")
+    }
+    parts.push(agent.role || "Sos un asistente de atencion al cliente.")
+    if (agent.instructions) parts.push("Instrucciones: " + agent.instructions)
+    if (agent.style) parts.push("Estilo: " + agent.style)
+    if (agent.systemPrompt) parts.push("System prompt: " + agent.systemPrompt)
+    if (knowledgeContext) parts.push(knowledgeContext)
+    parts.push("REGLAS: Sos amable y profesional. Respondes en espanol. Si no sabes algo, decilo honestamente. Mantenes respuestas concisas.")
+
+    const systemPrompt = parts.join("\n\n")
+
+    // Build messages from history + current
+    const messages = (history || []).concat([{ role: "user", content: message }])
+
+    // Call AI
+    const result = await aiService.processMessage({
+      tenantId,
+      agentId,
+      messages,
+      systemPrompt,
+      temperature: 0.7,
+    })
+
+    // Build conversation history for response
+    const conversationHistory = [
+      ...(history || []),
+      { role: "user", content: message },
+      { role: "assistant", content: result.content },
+    ]
+
+    return c.json({
+      response: result.content,
+      conversationHistory,
+      tokensUsed: result.tokensUsed,
+    })
+  } catch (error: any) {
+    console.error("[Agent Chat] Error:", error.message)
+    return c.json({ error: "Failed to process message" }, 500)
+  }
+})
+
+// === MESSAGE FEEDBACK (for training) ===
+whatsappRoutes.post("/messages/:messageId/feedback", async (c) => {
+  const tenantId = c.get("tenantId") as string
+  const messageId = c.req.param("messageId")
+  const body = await c.req.json()
+  const { feedback, note } = body
+
+  if (!feedback || !["correct", "incorrect", "needs_improvement"].includes(feedback)) {
+    return c.json({ error: "Feedback must be: correct, incorrect, or needs_improvement" }, 400)
+  }
+
+  const { db } = await import("../../../db")
+  const { messages } = await import("../../../db/schema")
+  const { eq } = await import("drizzle-orm")
+
+  try {
+    const msg = await db.query.messages.findFirst({
+      where: (m: any) => eq(m.id, messageId),
+    })
+
+    if (!msg) {
+      return c.json({ error: "Message not found" }, 404)
+    }
+
+    // Update message metadata with feedback
+    const existingMeta = (msg as any).metadata || {}
+    const [updated] = await db
+      .update(messages)
+      .set({
+        metadata: {
+          ...existingMeta,
+          feedback,
+          feedbackNote: note || null,
+          feedbackAt: new Date().toISOString(),
+        },
+      } as any)
+      .where(eq(messages.id, messageId))
+      .returning()
+
+    return c.json({ ok: true, feedback, messageId })
+  } catch (error: any) {
+    return c.json({ error: "Failed to save feedback" }, 500)
+  }
+})
+
 // === MASTER PROMPT (Admin only) ===
 whatsappRoutes.get("/master-prompt", async (c) => {
   const tenantId = c.get("tenantId") as string
